@@ -15,6 +15,7 @@ def update_cache
   # 現時点ではmarkdownしかSupportしない。
   $cache = Dir.glob('./markdown/**/*.md')
              .map{|fp| fp.gsub(/^\.\/markdown/, 'http://localhost:4567/path') }
+             .sort
 end
 
 update_cache
