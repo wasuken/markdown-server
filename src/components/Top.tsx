@@ -1,18 +1,27 @@
 import React, { useReducer, useEffect } from "react";
-import Search from "./Search"
+import Search from "./Search.tsx";
+import dayjs from "dayjs";
+import utc from 'dayjs/plugin/utc.js'
+dayjs.extend(utc);
+
+type FileType = {
+	link: string,
+	path: string,
+	updated_at: string,
+}
 
 type InitialStateType = {
 	loading: boolean,
-	links: Array<string>,
-	searchLinks: Array<string>,
+	files: Array<FileType>,
+	searchFiles: Array<FileType>,
 	errorMessage: string,
 	query: string,
 }
 
 const initialState = {
 	loading: true,
-	links: [],
-	searchLinks: [],
+	files: [],
+	searchFiles: [],
 	errorMessage: "",
 	query: "",
 }
@@ -21,7 +30,7 @@ type ActionType = {
 	type: string,
 	query: string,
 	error: string,
-	payload: Array<string>,
+	payload: Array<FileType>,
 }
 
 const reducer: ((state: InitialStateType, action: ActionType) => InitialStateType) = (state, action) => {
@@ -36,8 +45,8 @@ const reducer: ((state: InitialStateType, action: ActionType) => InitialStateTyp
 			return {
 				...state,
 				loading: false,
-				links: action.payload,
-				searchLinks: action.payload
+				files: action.payload,
+				searchFiles: action.payload
 			};
 		case "FAILURE":
 			return {
@@ -45,10 +54,17 @@ const reducer: ((state: InitialStateType, action: ActionType) => InitialStateTyp
 				loading: false,
 				errorMessage: action.error
 			};
-		case "SEARCH":
+		case "SEARCH_QUERY":
 			return {
 				...state,
-				searchLinks: state.links.filter(link => link.indexOf(action.query) >= 0),
+				searchFiles: state.files.filter(file => file.link.indexOf(action.query) >= 0),
+				query: action.query,
+			}
+		case "SEARCH_DATE":
+			const dt = dayjs(action.query);
+			return {
+				...state,
+				searchFiles: state.files.filter(file => dt.isBefore(dayjs(file.updated_at))),
 				query: action.query,
 			}
 		default:
@@ -83,11 +99,21 @@ function Top(){
 			});
 	}, []);
 
-	let { searchLinks, loading, errorMessage } = state;
+	let { searchFiles, loading, errorMessage } = state;
 
-	const search = ( query: string ) => {
+	const searchQuery: ((query:string) => void) = ( query: string ) => {
 		const action: ActionType = {
-			type: "SEARCH",
+			type: "SEARCH_QUERY",
+			error: "",
+			query: query,
+			payload: [],
+		}
+		dispatch(action);
+	}
+
+	const searchDate: ((query:string) => void) = ( query: string ) => {
+		const action: ActionType = {
+			type: "SEARCH_DATE",
 			error: "",
 			query: query,
 			payload: [],
@@ -97,14 +123,25 @@ function Top(){
 
 	return (
 		<div>
-			<p>
-			<Search search={search} title="title検索" />
-			</p>
+			<div>
+			<Search searchQuery={searchQuery} searchDate={searchDate} title="title検索" />
+			</div>
+			<div>
+			query: { state.query }
+			</div>
 			{
 				loading? ( <p>Loading...</p> )
 					:
 					( <ul>
-						{ searchLinks.map((link, i) => <li key={i}><a href={link}>{link.split('/').slice(4).join('/')}</a></li>) }
+						{ state.searchFiles.map((file, i) => {
+							return (
+								<li key={i}>
+									<a href={file.link}>
+									{file.path}({file['updated_at']})
+								</a>
+									</li>
+							)
+						}) }
 						</ul> )
 			}
 			</div>

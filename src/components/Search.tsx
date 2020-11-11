@@ -1,39 +1,56 @@
 import React, { useState } from 'react';
 
-// 参考元:
-// https://www.freecodecamp.org/news/how-to-build-a-movie-search-app-using-react-hooks-24eb72ddfaf7/
-
-type Props = {
-	search: (v:string) => void;
+type SearchProps = {
+	searchQuery: (v:string) => void;
+	searchDate: (v:string) => void;
 	title: string;
 }
 
-const Search: React.FC<Props> = (props) => {
-	const [searchValue, setSearchValue] = useState("");
+const Search: React.FC<SearchProps> = (props: SearchProps) => {
+	const [searchQuery, setSearchQuery] = useState("");
+	const [searchDate, setSearchDate] = useState("");
 
-	const handleSearchInputChanges: ((e:React.ChangeEvent<HTMLInputElement>) => void) = (e) => {
-		setSearchValue(e.target.value);
+	const handleSearchQueryInputChanges: ((e:React.ChangeEvent<HTMLInputElement>) => void) = (e) => {
+		setSearchQuery(e.target.value);
+	}
+
+	const handleSearchDateInputChanges: ((e:React.ChangeEvent<HTMLInputElement>) => void) = (e) => {
+		setSearchDate(e.target.value);
 	}
 
 	const resetInputField = () => {
-		setSearchValue("");
+		setSearchQuery("");
+		setSearchDate("");
 	}
 
-	const callSearchFunction: ((e: React.MouseEvent<HTMLInputElement>) => void) = (e) => {
+	const callSearchQueryFunction: ((e: React.MouseEvent<HTMLInputElement>) => void) = (e) => {
 		e.preventDefault();
-		props.search(searchValue);
+		props.searchQuery(searchQuery);
+		resetInputField();
+	}
+
+	const callSearchDateFunction: ((e: React.MouseEvent<HTMLInputElement>) => void) = (e) => {
+		e.preventDefault();
+		props.searchDate(searchDate);
 		resetInputField();
 	}
 
 	return (
 		<div>
-			{props.title}:
-			<input type="text" value={searchValue}
-		onChange={handleSearchInputChanges}
+			<div>
+			<input type="text" value={searchQuery}
+		onChange={handleSearchQueryInputChanges}
 			/>
-			<input type="submit" value="検索" onClick={callSearchFunction}/>
+			<input type="submit" value="Query" onClick={callSearchQueryFunction}/>
+			</div>
+
+			<div>
+			<input type="date" value={searchDate}
+		onChange={handleSearchDateInputChanges}
+			/>
+			<input type="submit" value="AfterDate" onClick={callSearchDateFunction}/>
+			</div>
 			</div>
 	);
 }
-
 export default Search;

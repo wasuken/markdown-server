@@ -15,8 +15,14 @@ def update_cache
   puts "updated"
   # 現時点ではmarkdownしかSupportしない。
   $cache = Dir.glob('./markdown/**/*.md')
-             .map{|fp| fp.gsub(/^\.\/markdown/, 'http://localhost:4567/path') }
-             .sort
+             .map{|fp|
+    fst = File::Stat.new(fp)
+    {
+      link: fp.gsub(/^\.\/markdown/, 'http://localhost:4567/path'),
+      path: fp.gsub(/^\.\/markdown/, ''),
+      updated_at: fst.mtime
+    }
+  }
 end
 
 def render_content(path)
