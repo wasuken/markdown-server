@@ -1,21 +1,23 @@
 import React, { useReducer, useEffect } from "react";
-import Search from "./Search.tsx";
+import Search from "./Search";
+import Content from "./Content";
 import dayjs from "dayjs";
 import utc from 'dayjs/plugin/utc.js'
 dayjs.extend(utc);
 
-type FileType = {
-	link: string,
-	path: string,
-	updated_at: string,
+interface FileInterface {
+	link: string;
+	path: string;
+	updated_at: string;
 }
 
 type InitialStateType = {
-	loading: boolean,
-	files: Array<FileType>,
-	searchFiles: Array<FileType>,
-	errorMessage: string,
-	query: string,
+	loading: boolean;
+	files: Array<FileInterface>;
+	searchFiles: Array<FileInterface>;
+	errorMessage: string;
+	currentPath: string;
+	query: string;
 }
 
 const initialState = {
@@ -23,15 +25,17 @@ const initialState = {
 	files: [],
 	searchFiles: [],
 	errorMessage: "",
+	currentPath: "",
 	query: "",
 }
 
 type ActionType = {
-	type: string,
-	orderKey: number,
-	query: string,
-	error: string,
-	payload: Array<FileType>,
+	type: string;
+	orderKey: number;
+	query: string;
+	error: string;
+	payload: Array<FileInterface>;
+	currentPath: string;
 }
 
 let initialAction = {
@@ -40,10 +44,11 @@ let initialAction = {
 	query: "",
 	error: "",
 	payload: [],
+	currentPath: "",
 }
 
 const reducer: ((state: InitialStateType, action: ActionType) => InitialStateType) = (state, action) => {
-	let lst: Array<FileType> = [];
+	let lst: Array<FileInterface> = [];
 	switch(action.type){
 		case "REQUEST":
 			return {
@@ -100,6 +105,11 @@ const reducer: ((state: InitialStateType, action: ActionType) => InitialStateTyp
 				...state,
 				loading: false,
 				searchFiles: lst.sort((a, b) => -(action.orderKey * a.path.localeCompare(b.path)))
+			};
+		case "CHANGE_CURRENT_FILEPATH":
+			return {
+				...state,
+				currentPath: action.currentPath,
 			};
 		default:
 			return state;
@@ -191,13 +201,21 @@ function Top(){
 		}
 	}
 
-
+	const changeCurrentPath: ((path:string) => void) = (path) => {
+		const action: ActionType = {
+			...initialAction,
+			type: "CHANGE_CURRENT_FILEPATH",
+			currentPath: path,
+		}
+		dispatch(action);
+	}
 
 	return (
 		<div>
 			<div>
 			<Search searchQuery={searchQuery} searchDate={searchDate} title="title検索" />
 			</div>
+
 			<div>
 			<input type="submit" value="FilesOrderByDate" onClick={callFilesOrderByDateFunction}/>
 			<input type="submit" value="FilesOrderByName" onClick={callFilesOrderByNameFunction}/>
@@ -217,22 +235,33 @@ function Top(){
 
 			<div>
 			query: { state.query }
+		</div>
+			<div>
+
+			<div style={{float: "left", width: "20%", height: "90%", overflow: "scroll"}}>
+		{
+			loading? ( <p>Loading...</p> )
+				:
+				( <ul>
+					{ state.searchFiles.map((file, i) => {
+						return (
+							<li key={i}>
+								<a href={file.link}>
+								{file.path}({file['updated_at']})
+							</a>
+								<button onClick={() => changeCurrentPath(file.path)}>Preview</button>
+								</li>
+						)
+					}) }
+				  </ul> )
+		}
+		</div>
+
+			<div style={{float: "left", width: "70%"}}>
+			{state.currentPath ? (<Content path={state.currentPath} />) : (<div></div>)}
 			</div>
-			{
-				loading? ( <p>Loading...</p> )
-					:
-					( <ul>
-						{ state.searchFiles.map((file, i) => {
-							return (
-								<li key={i}>
-									<a href={file.link}>
-									{file.path}({file['updated_at']})
-								</a>
-									</li>
-							)
-						}) }
-						</ul> )
-			}
+
+		</div>
 			</div>
 	);
 }
