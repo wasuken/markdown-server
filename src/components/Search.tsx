@@ -41,14 +41,14 @@ const Search: React.FC<SearchProps> = (props: SearchProps) => {
 			<input type="text" value={searchQuery}
 		onChange={handleSearchQueryInputChanges}
 			/>
-			<input type="submit" value="Query" onClick={callSearchQueryFunction}/>
+			<input className="uk-button-primary" type="submit" value="Query" onClick={callSearchQueryFunction}/>
 			</div>
 
 			<div>
 			<input type="date" value={searchDate}
 		onChange={handleSearchDateInputChanges}
 			/>
-			<input type="submit" value="AfterDate" onClick={callSearchDateFunction}/>
+			<input className="uk-button-primary" type="submit" value="AfterDate" onClick={callSearchDateFunction}/>
 			</div>
 			</div>
 	);

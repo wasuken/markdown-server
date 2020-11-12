@@ -1,4 +1,5 @@
 import React, { useReducer, useEffect } from "react";
+import marked from 'marked';
 
 type Props = {
 	path: string;
@@ -79,14 +80,20 @@ const Content: React.FC<Props> = (props: Props) => {
 			});
 	}, [props.path]);
 	return (
-		<div style={{float: "left"}}>
+		<div className="markdown-body"
+			 style={{float: "left",
+					 overflow: "scroll",
+					 width: "100%",
+					 height: "100%"}}>
 			{(state.error? state.error :
-				(<div>
-					<h3>{props.path}</h3>
-					<div>
-					{state.content}
-				 </div>
-					</div>))}
+			  (<div>
+				  <h3>{props.path}</h3>
+				  <div>
+					  <div dangerouslySetInnerHTML={{
+						  __html: marked(state.content)
+					  }}></div>
+				  </div>
+			  </div>))}
 		</div>
 	);
 }

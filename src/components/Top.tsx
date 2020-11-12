@@ -212,57 +212,62 @@ function Top(){
 
 	return (
 		<div>
-			<div>
-			<Search searchQuery={searchQuery} searchDate={searchDate} title="title検索" />
+			<div style={{width: "100%"}}>
+				<div style={{float: "left", width: "20%", height: "90%", overflow: "scroll"}}>
+					<div>
+						<div>
+							<Search searchQuery={searchQuery} searchDate={searchDate} title="title検索" />
+							<input className="uk-button-primary"
+								   type="submit"
+								   value="FilesOrderByDate"
+								   onClick={callFilesOrderByDateFunction} />
+							<input style={{marginLeft: "10px"}}
+								   className="uk-button-danger"
+								   type="submit"
+								   value="FilesOrderByName"
+								   onClick={callFilesOrderByNameFunction} />
+
+							<div onChange={radioChangeValue}>
+								<p>
+									<input type="radio" id="asc" name="orderKey" value="asc" defaultChecked={initialAction.orderKey !== 1} />
+									<label htmlFor="asc">asc</label>
+								</p>
+
+								<p>
+									<input type="radio" id="desc" name="orderKey" value="desc" defaultChecked={initialAction.orderKey === 1}/>
+									<label htmlFor="desc">desc</label>
+								</p>
+							</div>
+						</div>
+					</div>
+					<div>
+						query: { state.query }
+					</div>
+					{
+						loading? ( <p>Loading...</p> )
+						:
+						( <ul className="uk-list">
+							{ state.searchFiles.map((file, i) => {
+								  return (
+									  <li key={i}>
+										  <a href={file.link}>
+											  {file.path}({file['updated_at']})
+										  </a>
+										  <button className="uk-button-primary"
+												  onClick={() => changeCurrentPath(file.path)}>
+											  Preview
+										  </button>
+									  </li>
+								  )
+							}) }
+						</ul> )
+					}
+				</div>
+				<div style={{float: "left", width: "70%", height: "90%"}}>
+					{state.currentPath ? (<Content path={state.currentPath} />) : (<div></div>)}
+				</div>
 			</div>
-
-			<div>
-			<input type="submit" value="FilesOrderByDate" onClick={callFilesOrderByDateFunction}/>
-			<input type="submit" value="FilesOrderByName" onClick={callFilesOrderByNameFunction}/>
-
-			<div onChange={radioChangeValue}>
-			<p>
-			<input type="radio" id="asc" name="orderKey" value="asc" defaultChecked={initialAction.orderKey !== 1} />
-			<label htmlFor="asc">asc</label>
-			</p>
-
-			<p>
-			<input type="radio" id="desc" name="orderKey" value="desc" defaultChecked={initialAction.orderKey === 1}/>
-			<label htmlFor="desc">desc</label>
-			</p>
-			</div>
-			</div>
-
-			<div>
-			query: { state.query }
 		</div>
-			<div>
-
-			<div style={{float: "left", width: "20%", height: "90%", overflow: "scroll"}}>
-		{
-			loading? ( <p>Loading...</p> )
-				:
-				( <ul>
-					{ state.searchFiles.map((file, i) => {
-						return (
-							<li key={i}>
-								<a href={file.link}>
-								{file.path}({file['updated_at']})
-							</a>
-								<button onClick={() => changeCurrentPath(file.path)}>Preview</button>
-								</li>
-						)
-					}) }
-				  </ul> )
-		}
-		</div>
-
-			<div style={{float: "left", width: "70%"}}>
-			{state.currentPath ? (<Content path={state.currentPath} />) : (<div></div>)}
-			</div>
-
-		</div>
-			</div>
 	);
 }
 

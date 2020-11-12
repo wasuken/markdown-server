@@ -26,10 +26,14 @@
 		"webpack-cli": "^4.2.0"
 	},
 	"dependencies": {
+		"@types/marked": "^1.1.0",
 		"@types/react": "^16.9.56",
 		"@types/react-dom": "^16.9.9",
+		"@types/uikit": "^3.3.1",
 		"dayjs": "^1.9.6",
+		"marked": "^1.2.3",
 		"react": "^17.0.1",
-		"react-dom": "^17.0.1"
+		"react-dom": "^17.0.1",
+		"uikit": "^3.5.9"
 	}
 }
